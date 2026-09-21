@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inventario Beary's</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    color: #222;
+}
+
+.contenedor {
+    width: 94%;
+    max-width: 650px;
+    margin: auto;
+    padding: 18px 0 30px;
+}
+
+h1 {
+    text-align: center;
+    margin: 5px 0 4px;
+    font-size: 28px;
+}
+
+.subtitulo {
+    text-align: center;
+    color: #666;
+    margin: 0 0 18px;
+    font-size: 14px;
+}
+
+.area {
+    background: white;
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+.area h2 {
+    margin: 2px 0 12px;
+    font-size: 20px;
+}
+
+.producto {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.producto:last-child {
+    border-bottom: none;
+}
+
+.nombre {
+    flex: 1;
+    font-size: 16px;
+}
+
+.meta {
+    display: block;
+    color: #888;
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+input {
+    width: 78px;
+    height: 42px;
+    border: 1px solid #bbb;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 17px;
+    background: #fff;
+}
+
+.boton {
+    width: 100%;
+    border: none;
+    border-radius: 13px;
+    padding: 15px;
+    font-size: 17px;
+    font-weight: bold;
+    background: #222;
+    color: white;
+    margin-top: 4px;
+    cursor: pointer;
+}
+
+#mensaje {
+    text-align: center;
+    margin-top: 12px;
+    font-weight: bold;
+    min-height: 20px;
+}
+
+#resultado {
+    width: 100%;
+    min-height: 130px;
+    margin-top: 12px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    font-size: 16px;
+    resize: vertical;
+    display: none;
+}
+
+@media (max-width: 480px) {
+    .contenedor {
+        width: 96%;
+        padding-top: 12px;
+    }
+
+    h1 {
+        font-size: 25px;
+    }
+
+    .area {
+        padding: 12px;
+        border-radius: 14px;
+    }
+
+    .producto {
+        padding: 10px 0;
+    }
+
+    .nombre {
+        font-size: 15px;
+    }
+
+    input {
+        width: 74px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="contenedor">
+
+    <h1>🐻 Inventario Beary's</h1>
+    <p class="subtitulo">Escribe cuánto tienes físicamente. La página calculará cuánto falta.</p>
+
+    <div id="gris"></div>
+    <div id="morado"></div>
+    <div id="comida"></div>
+
+    <button class="boton" onclick="generarYCopiar()">
+        📋 Generar y copiar lista
+    </button>
+
+    <div id="mensaje"></div>
+
+    <textarea id="resultado" readonly></textarea>
+
+</div>
+
+<script>
+
+const productos = [{"name": "Jabón de trastes", "target": 1.0, "group": "gris"}, {"name": "Jabón de manos", "target": 1.0, "group": "gris"}, {"name": "Esponja de carita", "target": 3.0, "group": "gris"}, {"name": "Esponja para vasos", "target": 3.0, "group": "gris"}, {"name": "Fibra de acero", "target": 1.0, "group": "gris"}, {"name": "Fibra verde", "target": 1.0, "group": "gris"}, {"name": "Piedra pómez", "target": 1.0, "group": "gris"}, {"name": "Fabuloso", "target": 1, "group": "gris"}, {"name": "Kalan", "target": 1.0, "group": "gris"}, {"name": "Cloro", "target": 1.0, "group": "gris"}, {"name": "Ajax de baño", "target": 1.0, "group": "gris"}, {"name": "Ajax limón", "target": 1.0, "group": "gris"}, {"name": "Windex", "target": 1.0, "group": "gris"}, {"name": "Drano", "target": 1.0, "group": "gris"}, {"name": "Mechudo", "target": 1.0, "group": "gris"}, {"name": "Cafiza", "target": 1.0, "group": "gris"}, {"name": "Cafiza molinos", "target": 1.0, "group": "gris"}, {"name": "Popotes", "target": 1.0, "group": "gris"}, {"name": "Bolsas chicas de basura", "target": 2.0, "group": "gris"}, {"name": "Bolsas grandes de basura", "target": 1.0, "group": "gris"}, {"name": "Mangas", "target": 7.0, "group": "gris"}, {"name": "Papel de baño", "target": 8.0, "group": "gris"}, {"name": "Café", "target": 2.0, "group": "gris"}, {"name": "Vasos de 16 oz", "target": 4.0, "group": "gris"}, {"name": "Vasos de 12 oz", "target": 5.0, "group": "gris"}, {"name": "Vasos transparentes", "target": 5.0, "group": "gris"}, {"name": "Vasos de 10 oz", "target": 1.0, "group": "gris"}, {"name": "Vasos de espresso", "target": 1.0, "group": "gris"}, {"name": "Azúcar", "target": 1.0, "group": "gris"}, {"name": "Splenda", "target": 1.0, "group": "gris"}, {"name": "Stevia", "target": 1.0, "group": "gris"}, {"name": "Guantes", "target": 1.0, "group": "gris"}, {"name": "Servilletas", "target": 2.0, "group": "gris"}, {"name": "Servitoallas", "target": 2.0, "group": "gris"}, {"name": "Sanitas", "target": 3.0, "group": "gris"}, {"name": "Azúcar mascabado", "target": 1.0, "group": "gris"}, {"name": "Charolas chicas", "target": 1.0, "group": "gris"}, {"name": "Charolas grandes", "target": 1.0, "group": "gris"}, {"name": "Mangas desechables", "target": 4.0, "group": "gris"}, {"name": "Bolsas para pollo y cochinita", "target": 3.0, "group": "gris"}, {"name": "Rejillas", "target": 30.0, "group": "gris"}, {"name": "Totopos", "target": 16.0, "group": "gris"}, {"name": "Frijoles", "target": 6, "group": "gris"}, {"name": "Té de frutos", "target": 1.0, "group": "gris"}, {"name": "Té fresa/vainilla", "target": 1.0, "group": "gris"}, {"name": "Té verde", "target": 1.0, "group": "gris"}, {"name": "Té Earl Grey", "target": 1.0, "group": "gris"}, {"name": "Té English", "target": 1.0, "group": "gris"}, {"name": "Té mango/fresa", "target": 1.0, "group": "gris"}, {"name": "Té limón", "target": 1.0, "group": "gris"}, {"name": "Té limón/jengibre", "target": 1.0, "group": "gris"}, {"name": "Té manzanilla", "target": 1.0, "group": "gris"}, {"name": "Té manzanilla/vainilla", "target": 1.0, "group": "gris"}, {"name": "Té de granada", "target": 1.0, "group": "gris"}, {"name": "Helado de cookie and cream", "target": 10.0, "group": "gris"}, {"name": "Helado de vainilla", "target": 4.0, "group": "gris"}, {"name": "Helado de chocolate", "target": 4.0, "group": "gris"}, {"name": "Helado de fresa", "target": 10.0, "group": "gris"}, {"name": "Harina de waffles", "target": 1.0, "group": "gris"}, {"name": "Jamón", "target": 2.0, "group": "gris"}, {"name": "Tocino en trozos", "target": 2.0, "group": "gris"}, {"name": "Tocino en tiras", "target": 1.0, "group": "gris"}, {"name": "Jitomate", "target": 20.0, "group": "gris"}, {"name": "Cebolla", "target": 4.0, "group": "gris"}, {"name": "Lechuga", "target": 3.0, "group": "gris"}, {"name": "Limón", "target": 10.0, "group": "gris"}, {"name": "Chile serrano", "target": 0.25, "group": "gris"}, {"name": "Manzana", "target": 4.0, "group": "gris"}, {"name": "Relleno de dulce de leche", "target": 2.0, "group": "gris"}, {"name": "Relleno de chocolate", "target": 2.0, "group": "gris"}, {"name": "Relleno de mascarpone", "target": 2.0, "group": "gris"}, {"name": "Relleno de frutos rojos", "target": 2.0, "group": "gris"}, {"name": "Salsa verde", "target": 10.0, "group": "gris"}, {"name": "Salsa roja", "target": 10.0, "group": "gris"}, {"name": "Cochinita", "target": 2.0, "group": "gris"}, {"name": "Pollo", "target": 2, "group": "gris"}, {"name": "Crema", "target": 2.0, "group": "gris"}, {"name": "Crema batida", "target": 2.0, "group": "gris"}, {"name": "Coca", "target": 6.0, "group": "morado"}, {"name": "Coca zero", "target": 4.0, "group": "morado"}, {"name": "Coca light", "target": 4.0, "group": "morado"}, {"name": "Sprite", "target": 3.0, "group": "morado"}, {"name": "Mundet", "target": 3.0, "group": "morado"}, {"name": "Bolsas de pan", "target": 1.0, "group": "morado"}, {"name": "Bolsas grandes", "target": 40.0, "group": "morado"}, {"name": "Agua Santa María", "target": 6.0, "group": "morado"}, {"name": "Topochico", "target": 5.0, "group": "morado"}, {"name": "Vasos para porciones (llevar)", "target": 1.0, "group": "morado"}, {"name": "Tapas para porciones (llevar)", "target": 1.0, "group": "morado"}, {"name": "Papel encerado", "target": 1.0, "group": "morado"}, {"name": "Turín", "target": 1.0, "group": "morado"}, {"name": "Chai", "target": 1.0, "group": "morado"}, {"name": "Chai Mango", "target": 1.0, "group": "morado"}, {"name": "Taro", "target": 1.0, "group": "morado"}, {"name": "Matcha", "target": 1.0, "group": "morado"}, {"name": "Galleta Oreo", "target": 3.0, "group": "morado"}, {"name": "Suavicremas", "target": 2.0, "group": "morado"}, {"name": "Galleta Lotus", "target": 4.0, "group": "morado"}, {"name": "Chocolate Abuelita", "target": 3.0, "group": "morado"}, {"name": "Chocolate de decoración", "target": 1.0, "group": "morado"}, {"name": "Café descafeinado", "target": 1.0, "group": "morado"}, {"name": "Cajeta", "target": 4.0, "group": "morado"}, {"name": "Crema Lotus", "target": 1.0, "group": "morado"}, {"name": "Nutella", "target": 4.0, "group": "morado"}, {"name": "Mayonesa", "target": 1, "group": "comida"}, {"name": "Mostaza", "target": 1, "group": "comida"}, {"name": "Aguacate", "target": 18.0, "group": "comida"}, {"name": "Salsa Maggi", "target": 1.0, "group": "comida"}, {"name": "Salsa inglesa", "target": 1.0, "group": "comida"}, {"name": "Salsa matcha", "target": 1, "group": "comida"}, {"name": "Salsa Valentina", "target": 1.0, "group": "comida"}, {"name": "Catsup", "target": 1.0, "group": "comida"}, {"name": "Granola", "target": 1.0, "group": "comida"}, {"name": "Miel", "target": 1.0, "group": "comida"}, {"name": "Maple", "target": 1.0, "group": "comida"}, {"name": "Huevo", "target": 3.0, "group": "comida"}, {"name": "Comandas", "target": 5.0, "group": "comida"}, {"name": "Leche deslactosada", "target": 24.0, "group": "comida"}, {"name": "Leche entera", "target": 15.0, "group": "comida"}, {"name": "Leche light", "target": 6.0, "group": "comida"}, {"name": "Leche deslactosada light", "target": 6.0, "group": "comida"}, {"name": "Leche de almendra", "target": 4.0, "group": "comida"}, {"name": "Leche de coco", "target": 3.0, "group": "comida"}, {"name": "Leche de avena", "target": 4.0, "group": "comida"}, {"name": "Leche de soya", "target": 4.0, "group": "comida"}, {"name": "Concentrado de fresa", "target": 2.0, "group": "comida"}, {"name": "Concentrado de maracuya", "target": 2.0, "group": "comida"}, {"name": "Concentrado de mango", "target": 2.0, "group": "comida"}, {"name": "Pink lemonade", "target": 2.0, "group": "comida"}, {"name": "Caramelo", "target": 1.0, "group": "comida"}, {"name": "Tortillas", "target": 1.0, "group": "comida"}, {"name": "Chapatas", "target": 20, "group": "comida"}, {"name": "Croissant", "target": 15.0, "group": "comida"}, {"name": "Trapos limpios", "target": 50, "group": "comida"}, {"name": "Bolsa para trapos", "target": 1.0, "group": "comida"}, {"name": "Velcro", "target": 1.0, "group": "comida"}, {"name": "Osos para bebidas", "target": 1.0, "group": "comida"}, {"name": "Osos grandes", "target": 10.0, "group": "comida"}, {"name": "Limpiador de horno", "target": 1.0, "group": "comida"}, {"name": "Protector de horno", "target": 1.0, "group": "comida"}];
+
+const nombresAreas = {
+    gris: "🩶 Bodega, refri y limpieza",
+    morado: "🟣 Bebidas",
+    comida: "🍔 Comida"
+};
+
+function numeroBonito(numero) {
+    if (Number.isInteger(numero)) return numero;
+    return Number(numero.toFixed(2));
+}
+
+function mostrarProductos(grupo, lugar) {
+
+    const contenedor = document.getElementById(lugar);
+
+    const area = document.createElement("div");
+    area.className = "area";
+
+    const titulo = document.createElement("h2");
+    titulo.textContent = nombresAreas[grupo];
+    area.appendChild(titulo);
+
+    productos
+        .filter(producto => producto.group === grupo)
+        .forEach((producto, indice) => {
+
+            const fila = document.createElement("div");
+            fila.className = "producto";
+
+            const nombre = document.createElement("div");
+            nombre.className = "nombre";
+            nombre.textContent = producto.name;
+
+            if (producto.target !== null) {
+                const meta = document.createElement("span");
+                meta.className = "meta";
+                meta.textContent = "Meta: " + numeroBonito(producto.target);
+                nombre.appendChild(meta);
+            }
+
+            const input = document.createElement("input");
+            input.type = "number";
+            input.min = "0";
+            input.step = "any";
+            input.inputMode = "decimal";
+            input.placeholder = "Tengo";
+            input.dataset.producto = producto.name;
+            input.dataset.objetivo = producto.target === null ? "" : producto.target;
+
+            input.id = "cantidad_" + grupo + "_" + indice;
+
+            // Guardado automático en ESTE teléfono/navegador.
+            const guardado = localStorage.getItem("inventarioFisico_v2_" + input.id);
+            if (guardado !== null) {
+                input.value = guardado;
+            }
+
+            input.addEventListener("input", function() {
+                localStorage.setItem("inventarioFisico_v2_" + input.id, input.value);
+            });
+
+            fila.appendChild(nombre);
+            fila.appendChild(input);
+            area.appendChild(fila);
+        });
+
+    contenedor.appendChild(area);
+}
+
+mostrarProductos("gris", "gris");
+mostrarProductos("morado", "morado");
+mostrarProductos("comida", "comida");
+
+function generarYCopiar() {
+
+    let lista = [];
+
+    document.querySelectorAll("input[data-producto]").forEach(input => {
+
+        // Si no escribieron nada, se ignora.
+        if (input.value === "") return;
+
+        const objetivo = parseFloat(input.dataset.objetivo);
+        const tengo = parseFloat(input.value);
+
+        // Productos sin meta definida también se ignoran.
+        if (isNaN(objetivo) || isNaN(tengo)) return;
+
+        const falta = objetivo - tengo;
+
+        // Si ya tenemos suficiente, no aparece.
+        if (falta <= 0) return;
+
+        lista.push(numeroBonito(falta) + " " + input.dataset.producto);
+    });
+
+    const texto = lista.join("\n");
+    const mensaje = document.getElementById("mensaje");
+    const resultado = document.getElementById("resultado");
+
+    if (texto === "") {
+        mensaje.textContent = "No falta nada 😎";
+        resultado.style.display = "none";
+        return;
+    }
+
+    resultado.value = texto;
+    resultado.style.display = "block";
+
+    // Copiado automático.
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(texto)
+            .then(() => {
+                mensaje.textContent = "✅ ¡Lista copiada! Ya puedes pegarla en WhatsApp.";
+            })
+            .catch(() => copiarAlternativo(texto, mensaje));
+    } else {
+        copiarAlternativo(texto, mensaje);
+    }
+}
+
+function copiarAlternativo(texto, mensaje) {
+    const resultado = document.getElementById("resultado");
+    resultado.style.display = "block";
+    resultado.focus();
+    resultado.select();
+
+    try {
+        document.execCommand("copy");
+        mensaje.textContent = "✅ ¡Lista copiada! Ya puedes pegarla en WhatsApp.";
+    } catch (e) {
+        mensaje.textContent = "📋 La lista está abajo; mantenla presionada para copiarla.";
+    }
+}
+
+</script>
+
+</body>
+</html>
